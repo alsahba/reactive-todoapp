@@ -1,8 +1,8 @@
 package com.asb.todoapp.todo.adapter.rest;
 
-import com.asb.todoapp.todo.adapter.persistence.TodoEntity;
-import com.asb.todoapp.todo.adapter.persistence.TodoRepository;
 import com.asb.todoapp.todo.adapter.rest.payload.AddTodoRequest;
+import com.asb.todoapp.todo.application.TodoService;
+import com.asb.todoapp.todo.domain.Todo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -13,26 +13,27 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class TodoController {
 
-   private final TodoRepository todoRepository;
+   private final TodoService todoService;
 
    @GetMapping
-   public Flux<TodoEntity> getTodos() {
-      return todoRepository.findAll();
+   public Flux<Todo> getAll() {
+      return todoService.getAll();
    }
 
    @GetMapping("/{id}")
-   public Mono<TodoEntity> getTodo(String id) {
-      return todoRepository.findById(id);
+   public Mono<Todo> get(String id) {
+      return todoService.get(id);
    }
 
    @PostMapping
-   public Mono<TodoEntity> createTodo(@RequestBody AddTodoRequest request) {
-      var todo = TodoEntity.builder()
-          .importance(request.getImportance())
-          .explanation(request.getExplanation())
-          .build();
+   public Mono<Todo> create(@RequestBody AddTodoRequest request) {
+      var command = request.toCommand();
+      return todoService.create(command);
+   }
 
-      return todoRepository.save(todo);
+   @DeleteMapping
+   public Mono<Void> delete(String id) {
+      return todoService.delete(id);
    }
 
 }
