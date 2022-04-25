@@ -9,9 +9,10 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Document(collection = "todo")
 @Getter
@@ -27,10 +28,13 @@ class TodoEntity {
    private Importance importance;
 
    @CreatedDate
-   private LocalDateTime creationDate;
+   private Instant creationDate;
 
    @LastModifiedDate
-   private LocalDateTime lastModifiedDate;
+   private Instant lastModifiedDate;
+
+   @Version
+   public Integer version;
 
    private Status status;
 
@@ -48,4 +52,5 @@ class TodoEntity {
           .status(status)
           .build();
    }
+
 }

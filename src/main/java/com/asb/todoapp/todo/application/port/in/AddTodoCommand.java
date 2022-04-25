@@ -1,11 +1,10 @@
-package com.asb.todoapp.todo.application.port.in.command;
+package com.asb.todoapp.todo.application.port.in;
 
 import com.asb.todoapp.todo.domain.Todo;
 import com.asb.todoapp.todo.domain.enumeration.Importance;
 import com.asb.todoapp.todo.domain.enumeration.Status;
 
-public record AddTodoCommand(String explanation,
-                             Importance importance) {
+public record AddTodoCommand(String explanation, Importance importance) {
 
    public Todo toDomain() {
       return Todo.builder()
@@ -13,4 +12,5 @@ public record AddTodoCommand(String explanation,
           .explanation(explanation)
           .importance(importance).build();
    }
+
 }

@@ -1,6 +1,6 @@
 package com.asb.todoapp.todo.adapter.handler.payload;
 
-import com.asb.todoapp.todo.application.port.in.command.AddTodoCommand;
+import com.asb.todoapp.todo.application.port.in.AddTodoCommand;
 import com.asb.todoapp.todo.domain.enumeration.Importance;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,4 +16,5 @@ public class AddTodoRequest {
    public AddTodoCommand toCommand() {
       return new AddTodoCommand(explanation, importance);
    }
+
 }

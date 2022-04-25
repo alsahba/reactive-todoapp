@@ -1,4 +1,4 @@
-package com.asb.todoapp.infrastructure.configuration;
+package com.asb.todoapp.shared.configuration;
 
 import com.asb.todoapp.todo.adapter.handler.TodoHandler;
 import org.springframework.context.annotation.Bean;

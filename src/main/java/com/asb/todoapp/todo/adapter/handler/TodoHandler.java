@@ -1,49 +1,46 @@
 package com.asb.todoapp.todo.adapter.handler;
 
+import com.asb.todoapp.shared.builder.ServerResponseBuilder;
 import com.asb.todoapp.todo.adapter.handler.payload.AddTodoRequest;
-import com.asb.todoapp.todo.application.TodoService;
-import org.springframework.http.MediaType;
+import com.asb.todoapp.todo.application.port.in.TodoCrudUC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.web.reactive.function.BodyInserters.fromValue;
-
 @Component
-public record TodoHandler(TodoService todoService) {
+public record TodoHandler(TodoCrudUC crudUC) {
 
    public Mono<ServerResponse> getAll(ServerRequest request) {
-      return todoService.getAll().collectList().flatMap(todo -> {
+      return crudUC.getAll().collectList().flatMap(todo -> {
              if (todo.isEmpty()) {
-                return ServerResponse.notFound().build();
+                return ServerResponseBuilder.notFound();
              }
-             return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(fromValue(todo));
+             return ServerResponseBuilder.ok(todo);
           }
       );
    }
 
    public Mono<ServerResponse> get(ServerRequest request) {
       var id = request.pathVariable("id");
-      return todoService.get(id)
-          .flatMap(todo -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(fromValue(todo)))
+      return crudUC.get(id)
+          .flatMap(ServerResponseBuilder::ok)
           .switchIfEmpty(ServerResponse.notFound().build());
    }
 
    public Mono<ServerResponse> create(ServerRequest request) {
       return request.bodyToMono(AddTodoRequest.class)
-          .flatMap(r -> todoService.create(r.toCommand())
-              .flatMap(todo -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(fromValue(todo))
-                  .switchIfEmpty(ServerResponse.badRequest().build())
-              )
+          .flatMap(r -> crudUC.create(r.toCommand())
+              .flatMap(ServerResponseBuilder::ok)
+              .switchIfEmpty(ServerResponse.badRequest().build())
           );
    }
 
    public Mono<ServerResponse> delete(ServerRequest request) {
       var id = request.pathVariable("id");
-      return todoService.delete(id)
-          .then(ServerResponse.ok().build())
-          .switchIfEmpty(ServerResponse.notFound().build());
+      return crudUC.delete(id)
+          .then(ServerResponseBuilder.ok())
+          .switchIfEmpty(ServerResponseBuilder.notFound());
    }
 
 }

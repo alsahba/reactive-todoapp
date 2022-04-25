@@ -1,6 +1,7 @@
 package com.asb.todoapp.todo.application;
 
-import com.asb.todoapp.todo.application.port.in.command.AddTodoCommand;
+import com.asb.todoapp.todo.application.port.in.AddTodoCommand;
+import com.asb.todoapp.todo.application.port.in.TodoCrudUC;
 import com.asb.todoapp.todo.application.port.out.TodoCrudPort;
 import com.asb.todoapp.todo.domain.Todo;
 import org.springframework.stereotype.Service;
@@ -8,7 +9,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public record TodoService(TodoCrudPort todoCrudPort) {
+record TodoService(TodoCrudPort todoCrudPort) implements TodoCrudUC {
 
    public Mono<Todo> create(AddTodoCommand command) {
       return todoCrudPort.save(command.toDomain());
