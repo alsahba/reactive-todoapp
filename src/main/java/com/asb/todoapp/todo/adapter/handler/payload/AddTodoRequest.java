@@ -1,4 +1,4 @@
-package com.asb.todoapp.todo.adapter.rest.payload;
+package com.asb.todoapp.todo.adapter.handler.payload;
 
 import com.asb.todoapp.todo.application.port.in.command.AddTodoCommand;
 import com.asb.todoapp.todo.domain.enumeration.Importance;
