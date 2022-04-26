@@ -5,3 +5,8 @@ spring:
       port: ${MONGODB_PORT:27017}
       username: ${MONGODB_USERNAME:root}
       password: ${MONGODB_PASSWORD:root}
+
+jwt:
+  secret: ${JWT_SECRET:secret}
+  expiration: ${JWT_EXPIRATION:2592000000}
+  prefix: ${JWT_PREFIX:Bearer }

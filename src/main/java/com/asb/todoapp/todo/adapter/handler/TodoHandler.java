@@ -25,7 +25,7 @@ public record TodoHandler(TodoCrudUC crudUC) {
       var id = request.pathVariable("id");
       return crudUC.get(id)
           .flatMap(ServerResponseBuilder::ok)
-          .switchIfEmpty(ServerResponse.notFound().build());
+          .switchIfEmpty(ServerResponseBuilder.notFound());
    }
 
    public Mono<ServerResponse> create(ServerRequest request) {

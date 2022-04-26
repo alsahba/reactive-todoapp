@@ -17,6 +17,10 @@ public class ServerResponseBuilder {
       return ServerResponse.notFound().build();
    }
 
+   public static Mono<ServerResponse> badRequest() {
+      return ServerResponse.badRequest().build();
+   }
+
    public static <T> Mono<ServerResponse> ok(T data) {
       return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(fromValue(data));
    }
