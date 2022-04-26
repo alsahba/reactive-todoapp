@@ -15,14 +15,14 @@ public record UserHandler(AppUserDetailsService appUserDetailsService) {
    public Mono<ServerResponse> register(ServerRequest request) {
       var registerRequest = request.bodyToMono(RegisterRequest.class);
       return appUserDetailsService.register(registerRequest)
-          .flatMap(user -> ServerResponseBuilder.ok())
-          .switchIfEmpty(ServerResponseBuilder.badRequest());
+          .onErrorReturn(ServerResponseBuilder.badRequest())
+          .flatMap(ServerResponseBuilder::ok);
    }
 
    public Mono<ServerResponse> login(ServerRequest request) {
       var loginRequest = request.bodyToMono(LoginRequest.class);
       return appUserDetailsService.login(loginRequest)
-          .flatMap(ServerResponseBuilder::ok)
-          .switchIfEmpty(ServerResponseBuilder.badRequest());
+          .onErrorReturn(ServerResponseBuilder.badRequest())
+          .flatMap(ServerResponseBuilder::ok);
    }
 }

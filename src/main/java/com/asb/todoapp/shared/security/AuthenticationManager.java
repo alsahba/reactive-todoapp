@@ -22,8 +22,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
           .filter(token -> token instanceof String)
           .flatMap(token -> {
              var username = jwtService.getUsernameFromToken((String) token);
-             return userDetailsService.findByUsername(username)
-                 .map(userDetails ->
+             return userDetailsService.findByUsername(username).map(userDetails ->
                      new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities())
                  );
           });

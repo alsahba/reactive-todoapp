@@ -9,10 +9,10 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 @Component
-public record TodoHandler(TodoCrudUC crudUC) {
+public record TodoHandler(TodoCrudUC todoCrud) {
 
    public Mono<ServerResponse> getAll(ServerRequest request) {
-      return crudUC.getAll().collectList().flatMap(todo -> {
+      return todoCrud.getAll().collectList().flatMap(todo -> {
              if (todo.isEmpty()) {
                 return ServerResponseBuilder.notFound();
              }
@@ -23,14 +23,14 @@ public record TodoHandler(TodoCrudUC crudUC) {
 
    public Mono<ServerResponse> get(ServerRequest request) {
       var id = request.pathVariable("id");
-      return crudUC.get(id)
+      return todoCrud.get(id)
           .flatMap(ServerResponseBuilder::ok)
           .switchIfEmpty(ServerResponseBuilder.notFound());
    }
 
    public Mono<ServerResponse> create(ServerRequest request) {
       return request.bodyToMono(AddTodoRequest.class)
-          .flatMap(r -> crudUC.create(r.toCommand())
+          .flatMap(r -> todoCrud.create(r.toCommand())
               .flatMap(ServerResponseBuilder::ok)
               .switchIfEmpty(ServerResponse.badRequest().build())
           );
@@ -38,7 +38,7 @@ public record TodoHandler(TodoCrudUC crudUC) {
 
    public Mono<ServerResponse> delete(ServerRequest request) {
       var id = request.pathVariable("id");
-      return crudUC.delete(id)
+      return todoCrud.delete(id)
           .then(ServerResponseBuilder.ok())
           .switchIfEmpty(ServerResponseBuilder.notFound());
    }

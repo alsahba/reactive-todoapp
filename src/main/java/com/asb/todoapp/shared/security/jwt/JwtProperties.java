@@ -6,14 +6,14 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 
 @Getter
 @ConfigurationProperties(prefix = "jwt")
-public class JwtConfigurationProps {
+public class JwtProperties {
 
    private final String secret;
    private final String prefix;
    private final long expiration;
 
    @ConstructorBinding
-   public JwtConfigurationProps(String secret, long expiration, String prefix) {
+   public JwtProperties(String secret, long expiration, String prefix) {
       this.secret = secret;
       this.expiration = expiration;
       this.prefix = prefix;

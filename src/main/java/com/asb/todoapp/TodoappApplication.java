@@ -1,13 +1,13 @@
 package com.asb.todoapp;
 
-import com.asb.todoapp.shared.configuration.MongoConfigurationProps;
-import com.asb.todoapp.shared.security.jwt.JwtConfigurationProps;
+import com.asb.todoapp.shared.configuration.MongoProperties;
+import com.asb.todoapp.shared.security.jwt.JwtProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties({MongoConfigurationProps.class, JwtConfigurationProps.class})
+@EnableConfigurationProperties({MongoProperties.class, JwtProperties.class})
 public class TodoappApplication {
 
 	public static void main(String[] args) {

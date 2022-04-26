@@ -1,5 +1,6 @@
 package com.asb.todoapp.user.application;
 
+import com.asb.todoapp.shared.exception.CustomSecurityException;
 import com.asb.todoapp.shared.security.AppPasswordEncoder;
 import com.asb.todoapp.shared.security.jwt.JwtService;
 import com.asb.todoapp.user.adapter.handler.payload.LoginRequest;
@@ -25,28 +26,26 @@ public class AppUserDetailsService implements ReactiveUserDetailsService {
    @Override
    public Mono<UserDetails> findByUsername(String username) {
       return appUserRepository.findByUsername(username)
-          .flatMap(a -> Mono.justOrEmpty(new AppUserDetails(a)));
+          .flatMap(user -> Mono.justOrEmpty(new AppUserDetails(user)));
    }
 
-   public Mono<AppUser> register(Mono<RegisterRequest> request) {
-      return request.flatMap(r -> {
-         AppUser user = new AppUser(r.getUsername(), passwordEncoder.encode(r.getPassword()));
-         return appUserRepository.findByUsername(r.getUsername())
-             .switchIfEmpty(appUserRepository.save(user));
-      });
+   public Mono<Object> register(Mono<RegisterRequest> requestMono) {
+      return requestMono.flatMap(
+          request -> {
+             var user = new AppUser(request.getUsername(), passwordEncoder.encode(request.getPassword()));
+             return appUserRepository.findByUsername(user.getUsername())
+                 .flatMap(registeredUser -> Mono.error(new CustomSecurityException("Username already exists")))
+                 .switchIfEmpty(appUserRepository.save(user));
+          }
+      );
    }
 
-   public Mono<LoginResponse> login(Mono<LoginRequest> request) {
-      return request.flatMap(r -> appUserRepository.findByUsername(r.getUsername())
-          .flatMap(u -> {
-             if (passwordEncoder.matches(r.getPassword(), u.getPassword())) {
-                var token = jwtService.createToken(u.getUsername());
-                return Mono.justOrEmpty(new LoginResponse(token));
-             } else {
-                return Mono.error(new RuntimeException("Invalid username or password"));
-             }
-          }));
+   public Mono<Object> login(Mono<LoginRequest> requestMono) {
+      return requestMono.flatMap(request ->
+         appUserRepository.findByUsername(request.getUsername())
+             .filter(user -> passwordEncoder.matches(request.getPassword(), user.getPassword()))
+             .switchIfEmpty(Mono.error(new CustomSecurityException("Username or password is incorrect")))
+             .map(user -> new LoginResponse(jwtService.generateToken(user.getUsername())))
+      );
    }
-
-
 }

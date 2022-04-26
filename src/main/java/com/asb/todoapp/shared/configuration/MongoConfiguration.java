@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @RequiredArgsConstructor
 public class MongoConfiguration extends AbstractReactiveMongoConfiguration {
 
-   private final MongoConfigurationProps mongoConfigurationProps;
+   private final MongoProperties mongoProperties;
 
    @Bean
    public ReactiveMongoTransactionManager transactionManager(ReactiveMongoDatabaseFactory dbFactory) {
@@ -28,10 +28,10 @@ public class MongoConfiguration extends AbstractReactiveMongoConfiguration {
    @Override
    @Bean
    public MongoClient reactiveMongoClient() {
-      String uriBuilder = "mongodb://" + mongoConfigurationProps.getUsername() +
-          ":" + mongoConfigurationProps.getPassword() +
-          "@" + mongoConfigurationProps.getHost() +
-          ":" + mongoConfigurationProps.getPort();
+      String uriBuilder = "mongodb://" + mongoProperties.getUsername() +
+          ":" + mongoProperties.getPassword() +
+          "@" + mongoProperties.getHost() +
+          ":" + mongoProperties.getPort();
       return MongoClients.create(uriBuilder);
    }
 

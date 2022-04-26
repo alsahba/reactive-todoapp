@@ -12,9 +12,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-public record JwtService(JwtConfigurationProps props) {
+public record JwtService(JwtProperties props) {
 
-   public String createToken(String username) {
+   public String generateToken(String username) {
       return Jwts.builder()
           .setSubject(username)
           .setExpiration(new Date(System.currentTimeMillis() + props.getExpiration()))

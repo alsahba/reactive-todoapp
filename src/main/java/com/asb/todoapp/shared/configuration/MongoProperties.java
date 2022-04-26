@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 
 @Getter
 @ConfigurationProperties(prefix = "spring.data.mongodb")
-public class MongoConfigurationProps {
+public class MongoProperties {
 
    private final String host;
    private final int port;
@@ -14,7 +14,7 @@ public class MongoConfigurationProps {
    private final String password;
 
    @ConstructorBinding
-   public MongoConfigurationProps(String host, int port, String username, String password) {
+   public MongoProperties(String host, int port, String username, String password) {
       this.host = host;
       this.port = port;
       this.username = username;
