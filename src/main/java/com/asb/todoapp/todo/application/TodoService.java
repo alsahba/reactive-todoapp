@@ -15,7 +15,7 @@ record TodoService(TodoCrudPort todoCrudPort) implements TodoCrudUC {
       return todoCrudPort.save(command.toDomain());
    }
 
-   public Mono<Void> delete(String id) {
+   public Mono<Object> delete(String id) {
       return todoCrudPort.delete(id);
    }
 

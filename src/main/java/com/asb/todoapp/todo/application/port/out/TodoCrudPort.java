@@ -12,6 +12,6 @@ public interface TodoCrudPort {
 
    Mono<Todo> findById(String id);
 
-   Mono<Void> delete(String id);
+   Mono<Object> delete(String id);
 
 }

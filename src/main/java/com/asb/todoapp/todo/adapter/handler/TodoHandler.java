@@ -39,8 +39,8 @@ public record TodoHandler(TodoCrudUC todoCrud) {
    public Mono<ServerResponse> delete(ServerRequest request) {
       var id = request.pathVariable("id");
       return todoCrud.delete(id)
-          .then(ServerResponseBuilder.ok())
-          .switchIfEmpty(ServerResponseBuilder.notFound());
+          .onErrorReturn(ServerResponseBuilder.badRequest())
+          .flatMap(ServerResponseBuilder::ok);
    }
 
 }

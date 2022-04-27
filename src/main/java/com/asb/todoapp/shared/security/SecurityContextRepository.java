@@ -3,7 +3,6 @@ package com.asb.todoapp.shared.security;
 import com.asb.todoapp.shared.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
@@ -25,8 +24,8 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
    @Override
    public Mono<SecurityContext> load(ServerWebExchange swe) {
-      String token = jwtService.getTokenFromAuthHeader(swe);
-      Authentication auth = new UsernamePasswordAuthenticationToken(token, token);
+      var token = jwtService.getTokenFromAuthHeader(swe);
+      var auth = new UsernamePasswordAuthenticationToken(token, token);
       return this.authenticationManager.authenticate(auth).map(SecurityContextImpl::new);
    }
 }
