@@ -13,27 +13,20 @@ import reactor.core.publisher.Mono;
 public record TodoHandler(TodoCrudUC todoCrud) {
 
    public Mono<ServerResponse> getAll(ServerRequest request) {
-      return todoCrud.getAll().collectList().flatMap(todo -> {
-             if (todo.isEmpty()) {
-                return ServerResponseBuilder.notFound();
-             }
-             return ServerResponseBuilder.ok(todo);
-          }
-      );
+      return todoCrud.getAll().collectList().flatMap(ServerResponseBuilder::ok);
    }
 
    public Mono<ServerResponse> get(ServerRequest request) {
       var id = request.pathVariable("id");
       return todoCrud.get(id)
           .flatMap(ServerResponseBuilder::ok)
-          .switchIfEmpty(ServerResponseBuilder.notFound());
+          .switchIfEmpty(Mono.defer(ServerResponseBuilder::notFound));
    }
 
    public Mono<ServerResponse> create(ServerRequest request) {
       return request.bodyToMono(AddTodoRequest.class)
-          .flatMap(r -> todoCrud.create(r.toCommand())
-              .flatMap(ServerResponseBuilder::ok)
-              .switchIfEmpty(ServerResponse.badRequest().build())
+          .flatMap(r ->
+              todoCrud.create(r.toCommand()).flatMap(ServerResponseBuilder::ok)
           );
    }
 
@@ -48,8 +41,8 @@ public record TodoHandler(TodoCrudUC todoCrud) {
    public Mono<ServerResponse> delete(ServerRequest request) {
       var id = request.pathVariable("id");
       return todoCrud.delete(id)
-          .onErrorReturn(ServerResponseBuilder.badRequest())
-          .flatMap(ServerResponseBuilder::ok);
+          .flatMap(ServerResponseBuilder::ok)
+          .onErrorResume(ServerResponseBuilder::badRequest);
    }
 
 }

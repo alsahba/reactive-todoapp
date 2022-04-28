@@ -1,12 +1,12 @@
 package com.asb.todoapp.shared.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
+import com.asb.todoapp.shared.exception.CustomSecurityException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -17,23 +17,30 @@ public record JwtService(JwtProperties props) {
    public String generateToken(String username) {
       return Jwts.builder()
           .setSubject(username)
-          .setExpiration(new Date(System.currentTimeMillis() + props.getExpiration()))
-          .signWith(SignatureAlgorithm.HS512, props.getSecret().getBytes(StandardCharsets.UTF_8))
+          .setExpiration(new Date(System.currentTimeMillis() + props.expiration()))
+          .signWith(SignatureAlgorithm.HS512, props.secret().getBytes(StandardCharsets.UTF_8))
           .compact();
    }
 
-   public String getUsernameFromToken(String token) {
-      Jws<Claims> claimsJws = Jwts.parser()
-          .setSigningKey(props.getSecret().getBytes(StandardCharsets.UTF_8))
-          .parseClaimsJws(token);
-      return claimsJws.getBody().getSubject();
+   public Mono<String> getUsernameFromToken(String token) {
+      try {
+         return Mono.just(
+             Jwts.parser()
+                 .setSigningKey(props.secret().getBytes(StandardCharsets.UTF_8))
+                 .parseClaimsJws(token)
+                 .getBody()
+                 .getSubject()
+         );
+      } catch (Exception e) {
+         return Mono.error(new CustomSecurityException("Invalid JWT token"));
+      }
    }
 
-   public String getTokenFromAuthHeader(ServerWebExchange exchange) {
+   public Mono<String> getTokenFromAuthHeader(ServerWebExchange exchange) {
       String authorizationHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-      if (authorizationHeader != null && authorizationHeader.startsWith(props.getPrefix())) {
-         return authorizationHeader.substring(props.getPrefix().length());
+      if (authorizationHeader != null && authorizationHeader.startsWith(props.prefix())) {
+         return Mono.just(authorizationHeader.substring(props.prefix().length()));
       }
-      return null;
+      return Mono.error(new CustomSecurityException("Missing or invalid Authorization header"));
    }
 }

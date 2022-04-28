@@ -28,10 +28,10 @@ public class MongoConfiguration extends AbstractReactiveMongoConfiguration {
    @Override
    @Bean
    public MongoClient reactiveMongoClient() {
-      String uriBuilder = "mongodb://" + mongoProperties.getUsername() +
-          ":" + mongoProperties.getPassword() +
-          "@" + mongoProperties.getHost() +
-          ":" + mongoProperties.getPort();
+      String uriBuilder = "mongodb://" + mongoProperties.username() +
+          ":" + mongoProperties.password() +
+          "@" + mongoProperties.host() +
+          ":" + mongoProperties.port();
       return MongoClients.create(uriBuilder);
    }
 

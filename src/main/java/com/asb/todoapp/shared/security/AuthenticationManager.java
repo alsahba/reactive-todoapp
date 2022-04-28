@@ -21,10 +21,11 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
       return Mono.justOrEmpty(authentication.getCredentials())
           .filter(token -> token instanceof String)
           .flatMap(token -> {
-             var username = jwtService.getUsernameFromToken((String) token);
-             return userDetailsService.findByUsername(username).map(userDetails ->
-                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities())
-                 );
+             var usernameMono = jwtService.getUsernameFromToken((String) token);
+             return usernameMono
+                 .flatMap(username -> userDetailsService.findByUsername(username).map(userDetails ->
+                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities())
+             )).onErrorResume(e -> Mono.empty());
           });
    }
 }

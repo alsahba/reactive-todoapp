@@ -8,10 +8,7 @@ import java.net.URI;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 
-public class ServerResponseBuilder {
-
-   private ServerResponseBuilder() {
-   }
+public abstract class ServerResponseBuilder {
 
    public static Mono<ServerResponse> notFound() {
       return ServerResponse.notFound().build();

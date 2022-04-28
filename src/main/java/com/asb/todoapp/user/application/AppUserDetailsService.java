@@ -35,7 +35,7 @@ public class AppUserDetailsService implements ReactiveUserDetailsService {
              var user = new AppUser(request.getUsername(), passwordEncoder.encode(request.getPassword()));
              return appUserRepository.findByUsername(user.getUsername())
                  .flatMap(registeredUser -> Mono.error(new CustomSecurityException("Username already exists")))
-                 .switchIfEmpty(appUserRepository.save(user));
+                 .switchIfEmpty(Mono.defer(() -> appUserRepository.save(user)));
           }
       );
    }
@@ -44,8 +44,10 @@ public class AppUserDetailsService implements ReactiveUserDetailsService {
       return requestMono.flatMap(request ->
          appUserRepository.findByUsername(request.getUsername())
              .filter(user -> passwordEncoder.matches(request.getPassword(), user.getPassword()))
-             .switchIfEmpty(Mono.error(new CustomSecurityException("Username or password is incorrect")))
              .map(user -> new LoginResponse(jwtService.generateToken(user.getUsername())))
+             .switchIfEmpty(
+                 Mono.defer(() -> Mono.error(new CustomSecurityException("Username or password is incorrect")))
+             )
       );
    }
 }

@@ -17,7 +17,7 @@ public class RedisConfiguration {
 
    @Bean
    public ReactiveRedisConnectionFactory reactiveRedisConnectionFactory() {
-      return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
+      return new LettuceConnectionFactory(redisProperties.host(), redisProperties.port());
    }
 
    @Bean
