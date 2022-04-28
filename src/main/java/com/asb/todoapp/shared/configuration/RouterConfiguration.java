@@ -22,6 +22,7 @@ public class RouterConfiguration {
    public RouterFunction<ServerResponse> todoRouter(TodoHandler handler) {
       return route(GET(TODO), handler::getAll)
           .andRoute(GET(TODO + ID), handler::get)
+          .andRoute(PUT(TODO + ID), handler::update)
           .andRoute(DELETE(TODO + ID), handler::delete)
           .andRoute(POST(TODO), handler::create);
    }

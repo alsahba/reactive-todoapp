@@ -10,6 +10,8 @@ public interface TodoCrudPort {
 
    Mono<Todo> save(Todo todo);
 
+   Mono<Object> update(Todo todo);
+
    Mono<Todo> findById(String id);
 
    Mono<Object> delete(String id);

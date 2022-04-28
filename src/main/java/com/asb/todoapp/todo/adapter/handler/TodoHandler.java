@@ -2,6 +2,7 @@ package com.asb.todoapp.todo.adapter.handler;
 
 import com.asb.todoapp.shared.builder.ServerResponseBuilder;
 import com.asb.todoapp.todo.adapter.handler.payload.AddTodoRequest;
+import com.asb.todoapp.todo.adapter.handler.payload.UpdateTodoRequest;
 import com.asb.todoapp.todo.application.port.in.TodoCrudUC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -34,6 +35,14 @@ public record TodoHandler(TodoCrudUC todoCrud) {
               .flatMap(ServerResponseBuilder::ok)
               .switchIfEmpty(ServerResponse.badRequest().build())
           );
+   }
+
+   public Mono<ServerResponse> update(ServerRequest request) {
+      var id = request.pathVariable("id");
+      return request.bodyToMono(UpdateTodoRequest.class)
+          .flatMap(r -> todoCrud.update(r.toCommand(id)))
+          .flatMap(ServerResponseBuilder::ok)
+          .onErrorResume(ServerResponseBuilder::badRequest);
    }
 
    public Mono<ServerResponse> delete(ServerRequest request) {

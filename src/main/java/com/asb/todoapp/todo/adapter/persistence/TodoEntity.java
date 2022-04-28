@@ -38,19 +38,25 @@ class TodoEntity {
 
    private Status status;
 
-   public TodoEntity(Todo todo) {
+   TodoEntity(Todo todo) {
       this.explanation = todo.getExplanation();
       this.importance = todo.getImportance();
       this.status = todo.getStatus();
    }
 
-   public Todo toDomain() {
+   Todo toDomain() {
       return Todo.builder()
           .id(id)
           .explanation(explanation)
           .importance(importance)
           .status(status)
           .build();
+   }
+
+   void update(Todo todo) {
+      this.explanation = todo.getExplanation();
+      this.importance = todo.getImportance();
+      this.status = todo.getStatus();
    }
 
 }
