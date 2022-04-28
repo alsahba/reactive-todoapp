@@ -1,7 +1,7 @@
 package com.asb.todoapp.shared.configuration;
 
-import com.asb.todoapp.user.adapter.handler.UserHandler;
 import com.asb.todoapp.todo.adapter.handler.TodoHandler;
+import com.asb.todoapp.user.adapter.handler.UserHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;

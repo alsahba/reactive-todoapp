@@ -18,14 +18,12 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 
    @Override
    public Mono<Authentication> authenticate(Authentication authentication) {
-      return Mono.justOrEmpty(authentication.getCredentials())
-          .filter(token -> token instanceof String)
-          .flatMap(token -> {
-             var usernameMono = jwtService.getUsernameFromToken((String) token);
-             return usernameMono
-                 .flatMap(username -> userDetailsService.findByUsername(username).map(userDetails ->
-                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities())
-             )).onErrorResume(e -> Mono.empty());
-          });
+      return Mono.justOrEmpty(authentication.getPrincipal())
+          .flatMap(token -> jwtService.getUsernameFromToken(token.toString()))
+          .flatMap(userDetailsService::findByUsername)
+          .map(user -> new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()))
+          .cast(Authentication.class)
+          .switchIfEmpty(Mono.defer(Mono::empty))
+          .onErrorResume(e -> Mono.empty());
    }
 }

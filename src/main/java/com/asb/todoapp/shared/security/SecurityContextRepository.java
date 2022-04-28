@@ -24,8 +24,8 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
    }
 
    @Override
-   public Mono<SecurityContext> load(ServerWebExchange swe) {
-      return jwtService.getTokenFromAuthHeader(swe)
+   public Mono<SecurityContext> load(ServerWebExchange serverWebExchange) {
+      return jwtService.getTokenFromAuthHeader(serverWebExchange)
           .flatMap(token -> authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(token, null)))
           .map(SecurityContextImpl::new);
    }

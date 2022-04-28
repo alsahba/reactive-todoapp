@@ -16,7 +16,7 @@ record TodoService(TodoCrudPort todoCrudPort) implements TodoCrudUC {
       return todoCrudPort.save(command.toDomain());
    }
 
-   public Mono<Object> update(UpdateTodoCommand command) {
+   public Mono<Todo> update(UpdateTodoCommand command) {
       return todoCrudPort.update(command.toDomain());
    }
 

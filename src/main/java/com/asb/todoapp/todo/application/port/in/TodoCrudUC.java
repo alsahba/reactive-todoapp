@@ -8,7 +8,7 @@ public interface TodoCrudUC {
 
    Mono<Todo> create(AddTodoCommand command);
 
-   Mono<Object> update(UpdateTodoCommand command);
+   Mono<Todo> update(UpdateTodoCommand command);
 
    Mono<Object> delete(String id);
 

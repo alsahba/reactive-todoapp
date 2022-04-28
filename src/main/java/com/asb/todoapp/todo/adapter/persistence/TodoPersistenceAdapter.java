@@ -28,27 +28,22 @@ class TodoPersistenceAdapter implements TodoCrudPort {
    }
 
    @Override
-   public Mono<Object> update(Todo todo) {
+   public Mono<Todo> update(Todo todo) {
       return redisClient.get(todo.getId())
           .filter(Boolean.TRUE::equals)
           .flatMap(locked -> Mono.error(new BusinessRuleException("Todo is locked")))
-          .switchIfEmpty(Mono.defer(() ->
-                  redisClient.set(todo.getId(), true).then(
-                      todoRepository.findById(todo.getId())
-                          .flatMap(todoEntity -> {
-                             todoEntity.update(todo);
-                             return todoRepository.save(todoEntity).map(TodoEntity::toDomain);
-                          }).switchIfEmpty(
-                              Mono.defer(() -> Mono.error(new BusinessRuleException("Todo is not found")))
-                          ).doOnSuccess(todo1 -> redisClient.set(todo.getId(), false).subscribe())
-                  )
-              )
-          );
+          .switchIfEmpty(Mono.defer(() -> lock(todo.getId())))
+          .flatMap(locked -> find(todo.getId()))
+          .flatMap(todoEntity -> {
+             todoEntity.update(todo);
+             return todoRepository.save(todoEntity);
+          }).map(TodoEntity::toDomain)
+          .doFinally(signal -> unlock(todo.getId()).subscribe());
    }
 
    @Override
    public Mono<Todo> findById(String id) {
-      return todoRepository.findById(id).map(TodoEntity::toDomain);
+      return find(id).map(TodoEntity::toDomain);
    }
 
    @Override
@@ -56,6 +51,21 @@ class TodoPersistenceAdapter implements TodoCrudPort {
       return redisClient.get(id)
           .filter(Boolean.TRUE::equals)
           .flatMap(locked -> Mono.error(new BusinessRuleException("Todo is locked")))
-          .switchIfEmpty(todoRepository.deleteById(id));
+          .switchIfEmpty(Mono.defer(() -> lock(id)))
+          .flatMap(locked -> find(id))
+          .flatMap(entity -> todoRepository.deleteById(entity.getId()));
+   }
+
+   private Mono<Boolean> lock(String id) {
+      return redisClient.set(id, true);
+   }
+
+   private Mono<Boolean> unlock(String id) {
+      return redisClient.set(id, false);
+   }
+
+   private Mono<TodoEntity> find(String id) {
+      return todoRepository.findById(id)
+          .switchIfEmpty(Mono.defer(() -> Mono.error(new BusinessRuleException("Todo not found"))));
    }
 }
