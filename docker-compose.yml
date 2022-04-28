@@ -7,6 +7,15 @@ services:
     container_name: app
     depends_on:
       - mongodb
+      - redis
+    environment:
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - MONGODB_USERNAME=root
+      - MONGODB_PASSWORD=root
+      - JWT_SECRET=dockerSecret
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
   mongodb:
     image: mongo:5.0.0
@@ -20,5 +29,14 @@ services:
     volumes:
       - mongodb_data_container:/data/db
 
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_container:/data
+
 volumes:
   mongodb_data_container:
+  redis_data_container:
