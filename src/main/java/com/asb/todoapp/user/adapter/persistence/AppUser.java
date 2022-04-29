@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
 
-@Document
+@Document(collection = "app_user")
 @Getter
 @Setter
 @NoArgsConstructor
